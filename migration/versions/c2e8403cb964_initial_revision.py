@@ -53,7 +53,7 @@ def upgrade() -> None:
     sa.Column('code', sa.Integer(), nullable=False),
     sa.Column('model', sa.String(length=50), nullable=False),
     sa.Column('color', sa.String(length=1), nullable=False),
-    sa.Column('type', sa.String(length=10), nullable=False),
+    sa.Column('type_', sa.String(length=10), nullable=False),
     sa.Column('price', postgresql.MONEY(), nullable=True),
     sa.ForeignKeyConstraint(['model'], ['product.model'], ),
     sa.PrimaryKeyConstraint('code')

@@ -56,7 +56,7 @@ class Printer(Base, BaseAutoNameMixin):
     code: Mapped[int_pk]
     model: Mapped[str] = mapped_column(ForeignKey("product.model"))
     color: Mapped[str] = mapped_column(String(1))
-    type: Mapped[str_10]
+    type_: Mapped[str_10]
     price: Mapped[money]
 
     product: Mapped["Product"] = relationship(back_populates="printer")
