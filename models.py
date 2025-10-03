@@ -10,6 +10,7 @@ from database import Base, BaseAutoNameMixin
 
 
 # pc_firm
+str_1 = Annotated[str, mapped_column(String(1))]
 str_10 = Annotated[str, mapped_column(String(10))]
 str_50 = Annotated[str, mapped_column(String(50))]
 small_int = Annotated[int, mapped_column(SmallInteger)]
@@ -55,8 +56,8 @@ class Laptop(Base, BaseAutoNameMixin):
 class Printer(Base, BaseAutoNameMixin):
     code: Mapped[int_pk]
     model: Mapped[str] = mapped_column(ForeignKey("product.model"))
-    color: Mapped[str] = mapped_column(String(1))
     type_: Mapped[str_10]
+    color: Mapped[str_1]
     price: Mapped[money]
 
     product: Mapped["Product"] = relationship(back_populates="printer")
