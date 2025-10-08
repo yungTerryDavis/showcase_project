@@ -7,7 +7,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import REAL
 
 from database import Base, BaseAutoNameMixin
+from enums import PrinterType, ProductType
 
+# pyright: reportUninitializedInstanceVariable=false
 
 # pc_firm
 str_1 = Annotated[str, mapped_column(String(1))]
@@ -22,7 +24,7 @@ int_pk = Annotated[int, mapped_column(primary_key=True)]
 class Product(Base, BaseAutoNameMixin):
     maker: Mapped[str_10]
     model: Mapped[str_50] = mapped_column(primary_key=True)
-    type_: Mapped[str_50]
+    type_: Mapped[ProductType]
 
     pc: Mapped["PC"] = relationship(back_populates="product")
     printer: Mapped["Printer"] = relationship(back_populates="product")
@@ -56,8 +58,8 @@ class Laptop(Base, BaseAutoNameMixin):
 class Printer(Base, BaseAutoNameMixin):
     code: Mapped[int_pk]
     model: Mapped[str] = mapped_column(ForeignKey("product.model"))
-    type_: Mapped[str_10]
     color: Mapped[str_1]
+    type_: Mapped[PrinterType]
     price: Mapped[money]
 
     product: Mapped["Product"] = relationship(back_populates="printer")
