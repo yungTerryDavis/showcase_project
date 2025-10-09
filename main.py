@@ -1,7 +1,19 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
+from utils import is_db_data_present, populate_db
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if not await is_db_data_present():
+        print("No data found. Populating DB...")
+        await populate_db()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/")
