@@ -1,9 +1,15 @@
 from collections import defaultdict
 from decimal import Decimal
+from typing import final
 
 from repository import SQLExRepository
 
+
+@final
 class SQLTasks:
+    def __init__(self) -> None:
+        self.repository = SQLExRepository()
+
     def _get_solution_dict(self) -> dict[str, str]:
         ...
 
@@ -35,7 +41,7 @@ class SQLTasks:
         return res
 
     async def solution_1(self) -> tuple[dict[str, list[str]], int]:
-        pcs = await SQLExRepository.get_pcs_cheaper(Decimal(500))
+        pcs = await self.repository.get_pcs_cheaper(Decimal(500))
         rows_n = 0
         res = defaultdict(list)
         for pc in pcs:
@@ -47,7 +53,7 @@ class SQLTasks:
         return dict(res), rows_n
 
     async def solution_2(self) -> tuple[dict[str, list[str]], int]:
-        makers = await SQLExRepository.get_makers_of_type("Printer")
+        makers = await self.repository.get_makers_of_type("Printer")
         rows_n = 0
         res = defaultdict(list)
         for maker in makers:
@@ -56,8 +62,8 @@ class SQLTasks:
 
         return dict(res), rows_n
 
-    async def solution_3(self):
-        laptops = await SQLExRepository.get_laptops_more_expensive(Decimal(1000))
+    async def solution_3(self) -> tuple[dict[str, list[str]], int]:
+        laptops = await self.repository.get_laptops_more_expensive(Decimal(1000))
         rows_n = 0
         res = defaultdict(list)
         for laptop in laptops:
@@ -68,8 +74,8 @@ class SQLTasks:
 
         return dict(res), rows_n
 
-    async def solution_4(self):
-        printers = await SQLExRepository.get_printers_colored("y")
+    async def solution_4(self) -> tuple[dict[str, list[str]], int]:
+        printers = await self.repository.get_printers_colored("y")
         rows_n = 0
         res = defaultdict(list)
         for printer in printers:
@@ -82,8 +88,8 @@ class SQLTasks:
 
         return dict(res), rows_n
 
-    async def solution_5(self):
-        pcs = await SQLExRepository.get_pcs_cheaper_filter_cds(
+    async def solution_5(self) -> tuple[dict[str, list[str]], int]:
+        pcs = await self.repository.get_pcs_cheaper_filter_cds(
             ["12x", "24x"], Decimal(600)
         )
         rows_n = 0
