@@ -32,7 +32,7 @@ class Product(Base, BaseAutoNameMixin):
 
     @override
     def __repr__(self):
-        return f"<Product(maker={self.maker}, model={self.model}, type_={self.type_})>"
+        return f"<Product(maker={self.maker}, model={self.model}, type_={self.type_.value})>"
 
 
 class PC(Base, BaseAutoNameMixin):
@@ -80,4 +80,4 @@ class Printer(Base, BaseAutoNameMixin):
     @override
     def __repr__(self):
         return (f"<Printer(code={self.code}, model={self.model}, color={self.color}, " 
-        f"type_={self.type_}, price={self.price})>")
+        f"type_={self.type_.value}, price={self.price})>")
