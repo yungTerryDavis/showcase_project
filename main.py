@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
+from starlette.status import HTTP_404_NOT_FOUND
 
 from utils import is_db_data_present, populate_db
 from sql_tasks import SQLTasks
@@ -25,4 +26,9 @@ async def read_root():
 @app.get("/sql_solutions/{task_id}")
 async def get_sql_solution(task_id: int, pseudo_table: bool = True):
     SQLT = SQLTasks()
-    return await SQLT.get_solution(task_id, pseudo_table)
+    try:
+        res = await SQLT.get_solution(task_id, pseudo_table)
+    except (ValueError, RuntimeError) as e:
+        return Response(str(e), status_code=HTTP_404_NOT_FOUND)
+
+    return res
