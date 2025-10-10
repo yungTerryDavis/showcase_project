@@ -5,9 +5,7 @@ from repository import get_objects_count
 
 
 async def is_db_data_present() -> bool:
-    laptops_count = await get_objects_count(Laptop)
-    print("Laptops count:", laptops_count)
-    return bool(laptops_count)
+    return bool(await get_objects_count(Laptop))
 
 
 async def populate_db():
