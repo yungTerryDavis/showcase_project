@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Annotated
+from typing import Annotated, override
 
 from sqlalchemy import ForeignKey, SmallInteger, String
 from sqlalchemy.dialects.postgresql import MONEY
@@ -30,6 +30,10 @@ class Product(Base, BaseAutoNameMixin):
     printer: Mapped["Printer"] = relationship(back_populates="product")
     laptop: Mapped["Laptop"] = relationship(back_populates="product")
 
+    @override
+    def __repr__(self):
+        return f"<Product(maker={self.maker}, model={self.model}, type_={self.type_})>"
+
 
 class PC(Base, BaseAutoNameMixin):
     code: Mapped[int_pk]
@@ -41,6 +45,11 @@ class PC(Base, BaseAutoNameMixin):
     price: Mapped[money]
 
     product: Mapped["Product"] = relationship(back_populates="pc")
+    
+    @override
+    def __repr__(self):
+        return (f"<PC(code={self.code}, model={self.model}, speed={self.speed}, " 
+        f"ram={self.ram}, hd={self.hd}, cd={self.cd}, price={self.price})>")
 
 
 class Laptop(Base, BaseAutoNameMixin):
@@ -54,6 +63,10 @@ class Laptop(Base, BaseAutoNameMixin):
 
     product: Mapped["Product"] = relationship(back_populates="laptop")
 
+    @override
+    def __repr__(self):
+        return (f"<Laptop(code={self.code}, model={self.model}, speed={self.speed}, " 
+        f"ram={self.ram}, hd={self.hd}, screen={self.screen}, price={self.price})>")
 
 class Printer(Base, BaseAutoNameMixin):
     code: Mapped[int_pk]
@@ -63,3 +76,8 @@ class Printer(Base, BaseAutoNameMixin):
     price: Mapped[money]
 
     product: Mapped["Product"] = relationship(back_populates="printer")
+
+    @override
+    def __repr__(self):
+        return (f"<Printer(code={self.code}, model={self.model}, color={self.color}, " 
+        f"type_={self.type_}, price={self.price})>")
