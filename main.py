@@ -23,6 +23,6 @@ async def read_root():
 
 
 @app.get("/sql_solutions/{task_id}")
-async def get_sql_solution(task_id: int):
+async def get_sql_solution(task_id: int, pseudo_table: bool = True):
     SQLT = SQLTasks()
-    return await SQLT.get_solution(task_id)
+    return await SQLT.get_solution(task_id, pseudo_table)
