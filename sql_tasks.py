@@ -1,17 +1,35 @@
 from collections import defaultdict
 from decimal import Decimal
-from typing import final
+from typing import TypeVar, final
 
+from sqlalchemy import ScalarResult
+
+from database import Base
 from repository import SQLExRepository
+
+
+T = TypeVar("T", bound=Base)
 
 
 @final
 class SQLTasks:
     def __init__(self) -> None:
-        self.repository = SQLExRepository()
+        self.repository = SQLExRepository()   
 
-    def _get_solution_dict(self) -> dict[str, str]:
-        ...
+    def _get_solution_dict(self, scalars: ScalarResult[T], fields_map: dict[str, list[str]]) -> tuple[dict[str, list[str]], int]:
+        """
+        Works for 1-type (1-model) scalars only
+        """
+        rows_n = 0
+        res = defaultdict(list)
+
+        for item in scalars:
+            for model, fields in fields_map.items():
+                for field in fields:
+                    res[".".join([model, field])].append(str(getattr(item, field)))
+            rows_n += 1
+
+        return dict(res), rows_n
 
     async def get_solution(self, task_id: int, pseudo_table: bool = True) -> dict[str, list[str]]:
         solution_dict: dict[str, list[str]]
@@ -42,15 +60,8 @@ class SQLTasks:
 
     async def solution_1(self) -> tuple[dict[str, list[str]], int]:
         pcs = await self.repository.get_pcs_cheaper(Decimal(500))
-        rows_n = 0
-        res = defaultdict(list)
-        for pc in pcs:
-            res["pc.model"].append(str(pc.model))
-            res["pc.speed"].append(str(pc.speed))
-            res["pc.hd"].append(str(pc.hd))
-            rows_n += 1
-
-        return dict(res), rows_n
+        fields = {"pc": ["model", "speed", "hd"]}
+        return self._get_solution_dict(pcs, fields)
 
     async def solution_2(self) -> tuple[dict[str, list[str]], int]:
         makers = await self.repository.get_makers_of_type("Printer")
@@ -64,40 +75,17 @@ class SQLTasks:
 
     async def solution_3(self) -> tuple[dict[str, list[str]], int]:
         laptops = await self.repository.get_laptops_more_expensive(Decimal(1000))
-        rows_n = 0
-        res = defaultdict(list)
-        for laptop in laptops:
-            res["laptop.model"].append(str(laptop.model))
-            res["laptop.ram"].append(str(laptop.ram))
-            res["laptop.screen"].append(str(laptop.screen))
-            rows_n += 1
-
-        return dict(res), rows_n
+        fields = {"laptop": ["model", "ram", "screen"]}
+        return self._get_solution_dict(laptops, fields)
 
     async def solution_4(self) -> tuple[dict[str, list[str]], int]:
         printers = await self.repository.get_printers_colored("y")
-        rows_n = 0
-        res = defaultdict(list)
-        for printer in printers:
-            res["printer.code"].append(str(printer.code))
-            res["printer.model"].append(str(printer.model))
-            res["printer.color"].append(str(printer.color))
-            res["printer.type_"].append(str(printer.type_.value))
-            res["printer.price"].append(str(printer.price))
-            rows_n += 1
-
-        return dict(res), rows_n
+        fields = {"printer": ["code", "model", "color", "type_", "price"]}
+        return self._get_solution_dict(printers, fields)
 
     async def solution_5(self) -> tuple[dict[str, list[str]], int]:
         pcs = await self.repository.get_pcs_cheaper_filter_cds(
             ["12x", "24x"], Decimal(600)
         )
-        rows_n = 0
-        res = defaultdict(list)
-        for pc in pcs:
-            res["pc.model"].append(str(pc.model))
-            res["pc.speed"].append(str(pc.speed))
-            res["pc.hd"].append(str(pc.hd))
-            rows_n += 1
-
-        return dict(res), rows_n
+        fields = {"pc": ["model", "speed", "hd"]}
+        return self._get_solution_dict(pcs, fields)
