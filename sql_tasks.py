@@ -16,20 +16,25 @@ class SQLTasks:
     def __init__(self) -> None:
         self.repository = SQLExRepository()   
 
-    def _get_solution_dict(self, scalars: ScalarResult[T], fields_map: dict[str, list[str]]) -> tuple[dict[str, list[str]], int]:
+    def _get_solution_dict(self, scalars: ScalarResult[T], fields_map: dict[str, list[str]]
+    ) -> tuple[dict[str, list[str]], int]:
         """
         Works for 1-type (1-model) scalars only
         """
-        rows_n = 0
-        res = defaultdict(list)
+        items = scalars.all()
+        print(items[0].__dict__)
+        rows_n = len(items)
+        if not rows_n:
+            return {}, 0
 
-        for item in scalars:
-            for model, fields in fields_map.items():
-                for field in fields:
-                    res[".".join([model, field])].append(str(getattr(item, field)))
-            rows_n += 1
+        model_name, fields = next(iter(fields_map.items()))
+        res = {
+            f"{model_name}.{field}": [str(obj.__dict__.get(field, "")) for obj in items]
+            for field in fields
+        }
 
-        return dict(res), rows_n
+        return res, rows_n
+
 
     async def get_solution(self, task_id: int, pseudo_table: bool = True) -> dict[str, list[str]]:
         solution_dict: dict[str, list[str]]
@@ -58,32 +63,32 @@ class SQLTasks:
 
         return res
 
-    async def solution_1(self) -> tuple[dict[str, list[str]], int]:
+    async def solution_1(self):
         pcs = await self.repository.get_pcs_cheaper(Decimal(500))
         fields = {"pc": ["model", "speed", "hd"]}
         return self._get_solution_dict(pcs, fields)
 
-    async def solution_2(self) -> tuple[dict[str, list[str]], int]:
+    async def solution_2(self):
         makers = await self.repository.get_makers_of_type("Printer")
         rows_n = 0
-        res = defaultdict(list)
+        res: dict[str, list[str]] = defaultdict(list)
         for maker in makers:
             res["product.maker"].append(str(maker))
             rows_n += 1
 
         return dict(res), rows_n
 
-    async def solution_3(self) -> tuple[dict[str, list[str]], int]:
+    async def solution_3(self):
         laptops = await self.repository.get_laptops_more_expensive(Decimal(1000))
         fields = {"laptop": ["model", "ram", "screen"]}
         return self._get_solution_dict(laptops, fields)
 
-    async def solution_4(self) -> tuple[dict[str, list[str]], int]:
+    async def solution_4(self):
         printers = await self.repository.get_printers_colored("y")
         fields = {"printer": ["code", "model", "color", "type_", "price"]}
         return self._get_solution_dict(printers, fields)
 
-    async def solution_5(self) -> tuple[dict[str, list[str]], int]:
+    async def solution_5(self):
         pcs = await self.repository.get_pcs_cheaper_filter_cds(
             ["12x", "24x"], Decimal(600)
         )
