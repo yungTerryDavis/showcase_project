@@ -14,7 +14,15 @@ T = TypeVar("T", bound=Base)
 @final
 class SQLTasks:
     def __init__(self) -> None:
-        self.repository = SQLExRepository()   
+        self.repository = SQLExRepository()
+        
+        self.solutions = {
+            1: self.solution_1,
+            2: self.solution_2,
+            3: self.solution_3,
+            4: self.solution_4,
+            5: self.solution_5,
+        }
 
     def _get_solution_dict(self, scalars: ScalarResult[T], fields_map: dict[str, list[str]]
     ) -> tuple[dict[str, list[str]], int]:
@@ -39,18 +47,15 @@ class SQLTasks:
     async def get_solution(self, task_id: int, pseudo_table: bool = True) -> dict[str, list[str]]:
         solution_dict: dict[str, list[str]]
         rows_n: int
-        res: dict[str, list[str]]
 
-        func_name = f"solution_{task_id}"
-        try:
-            func = getattr(self, func_name)
-            solution_dict, rows_n = await func()
-        except (AttributeError, TypeError) as e:
-            print(e)
+        solution_func = self.solutions.get(task_id)
+        if not solution_func:
             raise ValueError(f"No solution for task {task_id}")
 
+        solution_dict, rows_n = await solution_func()
+
         if pseudo_table:
-            res = {"headers": [], "rows": []}
+            res: dict[str, list[str]] = {"headers": [], "rows": []}
             for h in solution_dict.keys():
                 res["headers"].append(h)
             for i in range(rows_n):
