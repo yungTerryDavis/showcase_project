@@ -59,3 +59,14 @@ class SQLExRepository:
                 .where(cast(PC.price, Numeric) < price)
             )
             return await session.scalars(stmt)
+
+    @staticmethod
+    async def get_laptop_maker_speed_filter_hd(hd: float):
+        async with async_session_maker() as session:
+            stmt = (
+                select(Product.maker, Laptop.speed)
+                .join(Laptop)
+                .where(Laptop.hd >= hd)
+                .distinct()
+            )
+            return await session.execute(stmt)

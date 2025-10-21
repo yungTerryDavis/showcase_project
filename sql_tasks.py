@@ -115,3 +115,14 @@ async def solution_5():
     fields = {"pc": ["model", "speed", "hd"]}
     return SQLTasks.get_solution_dict(pcs, fields)
 
+@SQLTasks.add_to_registry(6)
+async def solution_6():
+    rows = await REPO.get_laptop_maker_speed_filter_hd(10)
+    rows_n = 0
+    res: dict[str, list[str]] = defaultdict(list)
+    for row in rows.all():
+        res["product.maker"].append(str(row[0]))
+        res["laptop.speed"].append(str(row[1]))
+        rows_n += 1
+
+    return dict(res), rows_n
