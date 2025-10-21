@@ -5,7 +5,7 @@ from typing import TypeVar, final
 from sqlalchemy import ScalarResult
 
 from database import Base
-from repository import SQLExRepository
+from repository import SQLExRepository as REPO
 
 
 T = TypeVar("T", bound=Base)
@@ -14,8 +14,6 @@ T = TypeVar("T", bound=Base)
 @final
 class SQLTasks:
     def __init__(self) -> None:
-        self.repository = SQLExRepository()
-        
         self.solutions = {
             1: self.solution_1,
             2: self.solution_2,
@@ -43,7 +41,6 @@ class SQLTasks:
 
         return res, rows_n
 
-
     async def get_solution(self, task_id: int, pseudo_table: bool = True) -> dict[str, list[str]]:
         solution_dict: dict[str, list[str]]
         rows_n: int
@@ -69,12 +66,12 @@ class SQLTasks:
         return res
 
     async def solution_1(self):
-        pcs = await self.repository.get_pcs_cheaper(Decimal(500))
+        pcs = await REPO.get_pcs_cheaper(Decimal(500))
         fields = {"pc": ["model", "speed", "hd"]}
         return self._get_solution_dict(pcs, fields)
 
     async def solution_2(self):
-        makers = await self.repository.get_makers_of_type("Printer")
+        makers = await REPO.get_makers_of_type("Printer")
         rows_n = 0
         res: dict[str, list[str]] = defaultdict(list)
         for maker in makers:
@@ -84,17 +81,17 @@ class SQLTasks:
         return dict(res), rows_n
 
     async def solution_3(self):
-        laptops = await self.repository.get_laptops_more_expensive(Decimal(1000))
+        laptops = await REPO.get_laptops_more_expensive(Decimal(1000))
         fields = {"laptop": ["model", "ram", "screen"]}
         return self._get_solution_dict(laptops, fields)
 
     async def solution_4(self):
-        printers = await self.repository.get_printers_colored("y")
+        printers = await REPO.get_printers_colored("y")
         fields = {"printer": ["code", "model", "color", "type_", "price"]}
         return self._get_solution_dict(printers, fields)
 
     async def solution_5(self):
-        pcs = await self.repository.get_pcs_cheaper_filter_cds(
+        pcs = await REPO.get_pcs_cheaper_filter_cds(
             ["12x", "24x"], Decimal(600)
         )
         fields = {"pc": ["model", "speed", "hd"]}
