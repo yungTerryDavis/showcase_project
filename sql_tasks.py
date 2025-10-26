@@ -52,6 +52,18 @@ class SQLTasks:
 
         return res, rows_n
 
+    @staticmethod
+    def _res_as_pseudotable(solution_dict: dict[str, list[str]], rows_n: int) -> dict[str, list[str]]:
+        res: dict[str, list[str]] = {"headers": [], "rows": []}
+        for h in solution_dict.keys():
+            res["headers"].append(h)
+        for i in range(rows_n):
+            row: list[str] = []
+            for h in solution_dict.keys():
+                row.append(solution_dict[h][i])
+            res["rows"].append(" ".join(row))
+        return res
+
     async def get_solution(self, task_id: int, pseudo_table: bool = True) -> dict[str, list[str]]:
         solution_dict: dict[str, list[str]]
         rows_n: int
@@ -65,14 +77,7 @@ class SQLTasks:
         solution_dict, rows_n = await solution_func()
 
         if pseudo_table:
-            res: dict[str, list[str]] = {"headers": [], "rows": []}
-            for h in solution_dict.keys():
-                res["headers"].append(h)
-            for i in range(rows_n):
-                row: list[str] = []
-                for h in solution_dict.keys():
-                    row.append(solution_dict[h][i])
-                res["rows"].append(" ".join(row))
+            res = self._res_as_pseudotable(solution_dict, rows_n)
         else:
             res = solution_dict
 
