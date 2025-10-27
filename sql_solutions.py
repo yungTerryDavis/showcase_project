@@ -9,7 +9,7 @@ from repository import SQLExRepository as REPO
 async def solution_1():
     pcs = await REPO.get_pcs_cheaper(Decimal(500))
     fields = {"pc": ["model", "speed", "hd"]}
-    return SQLTasks.get_solution_dict(pcs, fields)
+    return SQLTasks.get_solution(pcs, fields)
 
 
 @SQLTasks.add_to_registry(2)
@@ -27,14 +27,14 @@ async def solution_2():
 async def solution_3():
     laptops = await REPO.get_laptops_more_expensive(Decimal(1000))
     fields = {"laptop": ["model", "ram", "screen"]}
-    return SQLTasks.get_solution_dict(laptops, fields)
+    return SQLTasks.get_solution(laptops, fields)
 
 
 @SQLTasks.add_to_registry(4)
 async def solution_4():
     printers = await REPO.get_printers_colored("y")
     fields = {"printer": ["code", "model", "color", "type_", "price"]}
-    return SQLTasks.get_solution_dict(printers, fields)
+    return SQLTasks.get_solution(printers, fields)
 
 
 @SQLTasks.add_to_registry(5)
@@ -43,7 +43,7 @@ async def solution_5():
         ["12x", "24x"], Decimal(600)
     )
     fields = {"pc": ["model", "speed", "hd"]}
-    return SQLTasks.get_solution_dict(pcs, fields)
+    return SQLTasks.get_solution(pcs, fields)
 
 
 @SQLTasks.add_to_registry(6)

@@ -1,6 +1,9 @@
 from collections.abc import Awaitable
+import io
 from typing import Callable, TypeVar, final
 
+import dataframe_image as dfi
+import pandas as pd
 from sqlalchemy import ScalarResult
 
 from database import Base
@@ -33,9 +36,9 @@ class SQLTasks:
         return decorator
 
     @staticmethod
-    def get_solution_dict(scalars: ScalarResult[T], fields_map: dict[str, list[str]]
+    def get_solution(scalars: ScalarResult[T], fields_map: dict[str, list[str]]
     ) -> Solution:
-        """
+        """Method to make a dict out of scalars.
         Works for 1-type (1-model) scalars only
         """
         items = scalars.all()
@@ -64,7 +67,7 @@ class SQLTasks:
             res["rows"].append(" ".join(row))
         return res
 
-    async def get_solution(self, task_id: int, pseudo_table: bool = True) -> dict[str, list[str]]:
+    async def get_solution_dict(self, task_id: int, pseudo_table: bool = True) -> dict[str, list[str]]:
         solution_dict: dict[str, list[str]]
         rows_n: int
         if not self._registry:
@@ -82,3 +85,26 @@ class SQLTasks:
             res = solution_dict
 
         return res
+
+    async def get_solution_image(self, task_id: int) -> bytes:
+        solution_dict: dict[str, list[str]]
+        if not self._registry:
+            import sql_solutions as _
+
+        solution_func = self._registry.get(task_id)
+        if not solution_func:
+            raise ValueError(f"No solution for task {task_id}")
+
+        solution_dict, _ = await solution_func()
+
+        res_df = pd.DataFrame(solution_dict)
+        buf = io.BytesIO()
+
+        await dfi.export_async(
+            res_df,
+            buf,
+            table_conversion="matplotlib"
+        )
+        _ = buf.seek(0)
+
+        return buf.getvalue()

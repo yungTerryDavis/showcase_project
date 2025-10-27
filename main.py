@@ -24,11 +24,30 @@ async def read_root():
 
 
 @app.get("/sql_solutions/{task_id}")
-async def get_sql_solution(task_id: int, pseudo_table: bool = True):
+async def get_sql_solution_dict(task_id: int, pseudo_table: bool = True):
     SQLT = SQLTasks()
     try:
-        res = await SQLT.get_solution(task_id, pseudo_table)
+        res = await SQLT.get_solution_dict(task_id, pseudo_table)
     except (ValueError, RuntimeError) as e:
         return Response(str(e), status_code=HTTP_404_NOT_FOUND)
 
     return res
+
+
+@app.get("/sql_solutions/{task_id}/table")
+async def get_sql_solution_image(task_id: int, download: bool = False):
+    SQLT = SQLTasks()
+    try:
+        res = await SQLT.get_solution_image(task_id)
+    except (ValueError, RuntimeError) as e:
+        return Response(str(e), status_code=HTTP_404_NOT_FOUND)
+
+    headers: dict[str, str] = {}
+    if download:
+        headers["Content-Disposition"] = f"attachment; filename='solution_{task_id}.png'"
+
+    return Response(
+        res,
+        media_type="image/png",
+        headers=headers
+    )
