@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from sqlalchemy import cast, func, select, Numeric
+from sqlalchemy import cast, except_, func, select, Numeric, union
 
 from database import Base, async_session_maker
 from models import PC, Printer, Product, Laptop
@@ -68,5 +68,36 @@ class SQLExRepository:
                 .join(Laptop)
                 .where(Laptop.hd >= hd)
                 .distinct()
+            )
+            return await session.execute(stmt)
+
+    @staticmethod
+    async def get_all_product_price_of_maker(maker: str):
+        async with async_session_maker() as session:
+            u_subq = union(
+                select(PC.model, PC.price),
+                select(Laptop.model, Laptop.price),
+                select(Printer.model, Printer.price)
+            ).subquery(name="a")
+
+            stmt = select(
+                Product.model,
+                u_subq.c.price
+            ).join_from(
+                Product,
+                u_subq
+            ).where(
+                Product.maker == maker
+            )
+
+            print(stmt)
+            return await session.execute(stmt)
+
+    @staticmethod
+    async def get_makers_pc_not_laptop():
+        async with async_session_maker() as session:
+            stmt = except_(
+                select(Product.maker).where(Product.type_ == "PC"),
+                select(Product.maker).where(Product.type_ == "Laptop")
             )
             return await session.execute(stmt)

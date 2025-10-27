@@ -57,3 +57,28 @@ async def solution_6():
         rows_n += 1
 
     return dict(res), rows_n
+
+
+@SQLTasks.add_to_registry(7)
+async def solution_7():
+    rows = await REPO.get_all_product_price_of_maker("B")
+    rows_n = 0
+    res: dict[str, list[str]] = defaultdict(list)
+    for row in rows.all():
+        res["model"].append(str(row[0]))
+        res["price"].append(str(row[1]))
+        rows_n += 1
+
+    return dict(res), rows_n
+
+
+@SQLTasks.add_to_registry(8)
+async def solution_8():
+    rows = await REPO.get_makers_pc_not_laptop()
+    rows_n = 0
+    res: dict[str, list[str]] = defaultdict(list)
+    for row in rows.all():
+        res["maker"].append(str(row[0]))
+        rows_n += 1
+
+    return dict(res), rows_n

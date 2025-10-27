@@ -98,6 +98,7 @@ class SQLTasks:
         solution_dict, _ = await solution_func()
 
         res_df = pd.DataFrame(solution_dict)
+        res_df.index += 1
         buf = io.BytesIO()
 
         await dfi.export_async(
