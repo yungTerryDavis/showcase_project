@@ -4,6 +4,7 @@ from decimal import Decimal
 from sql_tasks import SQLTasks
 from repository import SQLExRepository as REPO
 
+print("sql_solutions")
 
 @SQLTasks.add_to_registry(1)
 async def solution_1():
@@ -79,6 +80,32 @@ async def solution_8():
     res: dict[str, list[str]] = defaultdict(list)
     for row in rows.all():
         res["maker"].append(str(row[0]))
+        rows_n += 1
+
+    return dict(res), rows_n
+
+
+@SQLTasks.add_to_registry(9)
+async def solution_9():
+    rows = await REPO.get_pc_makers_filter_speed(450)
+    rows_n = 0
+    res: dict[str, list[str]] = defaultdict(list)
+    for row in rows.all():
+        res["maker"].append(str(row[0]))
+        rows_n += 1
+
+    return dict(res), rows_n
+
+
+@SQLTasks.add_to_registry(10)
+async def solution_10():
+    rows = await REPO.get_printers_with_max_price()
+    rows_n = 0
+    res: dict[str, list[str]] = defaultdict(list)
+
+    for row in rows.all():
+        res["model"].append(str(row[0]))
+        res["price"].append(str(row[1]))
         rows_n += 1
 
     return dict(res), rows_n

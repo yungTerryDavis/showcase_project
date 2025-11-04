@@ -101,3 +101,26 @@ class SQLExRepository:
                 select(Product.maker).where(Product.type_ == "Laptop")
             )
             return await session.execute(stmt)
+
+    @staticmethod
+    async def get_pc_makers_filter_speed(speed: int):
+        async with async_session_maker() as session:
+            stmt = (
+            select(Product.maker)
+            .join(PC)
+            .where(PC.speed >= speed)
+            .distinct()
+            )
+
+            return await session.execute(stmt)
+
+    @staticmethod
+    async def get_printers_with_max_price():
+        async with async_session_maker() as session:
+            subq = select(func.max(Printer.price)).scalar_subquery()
+            stmt = (
+                select(Printer.model, Printer.price)
+                .where(Printer.price == subq)
+            )
+
+            return await session.execute(stmt)
