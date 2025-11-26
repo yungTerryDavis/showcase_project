@@ -4,7 +4,7 @@ from typing import Annotated, override
 from sqlalchemy import ForeignKey, SmallInteger, String
 from sqlalchemy.dialects.postgresql import MONEY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.types import REAL
+from sqlalchemy.types import ARRAY, REAL
 
 from database import Base, BaseAutoNameMixin
 from enums import PrinterType, ProductType
@@ -68,6 +68,7 @@ class Laptop(Base, BaseAutoNameMixin):
         return (f"<Laptop(code={self.code}, model={self.model}, speed={self.speed}, " 
         f"ram={self.ram}, hd={self.hd}, screen={self.screen}, price={self.price})>")
 
+
 class Printer(Base, BaseAutoNameMixin):
     code: Mapped[int_pk]
     model: Mapped[str] = mapped_column(ForeignKey("product.model"))
@@ -81,3 +82,19 @@ class Printer(Base, BaseAutoNameMixin):
     def __repr__(self):
         return (f"<Printer(code={self.code}, model={self.model}, color={self.color}, " 
         f"type_={self.type_.value}, price={self.price})>")
+
+
+# microservices
+str_array = Annotated[list[str], mapped_column(ARRAY(String))]
+
+class Movie(Base, BaseAutoNameMixin):
+    id: Mapped[int_pk]
+    name: Mapped[str]
+    plot: Mapped[str]
+    genres: Mapped[str_array]
+    casts: Mapped[str_array]
+
+    @override
+    def __repr__(self):
+        return (f"<Movie(id={self.id}, name={self.name}, plot={self.plot}, " 
+        f"genres={self.genres}, casts={self.casts})>")

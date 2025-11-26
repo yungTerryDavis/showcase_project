@@ -7,7 +7,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from database import Base, DATABASE_URL
-from models import Product, PC, Laptop, Printer
+from models import Product, PC, Laptop, Printer, Movie
 
 
 # this is the Alembic Config object, which provides
