@@ -9,6 +9,15 @@ python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
+3. Apply migrations
+```sh
+# Launch database
+docker-compose up -d
+
+# Apply migrations
+alembic upgrade head
+```
+
 ## Launch
 ```sh
 # Launch database
