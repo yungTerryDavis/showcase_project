@@ -1,6 +1,7 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from enums import PrinterType, ProductType
 from models import Laptop, PC, Printer, Product
-from database import async_session_maker
 from repository import get_objects_count
 
 
@@ -8,7 +9,7 @@ async def is_db_data_present() -> bool:
     return bool(await get_objects_count(Laptop))
 
 
-async def populate_db():
+async def populate_db(session: AsyncSession):
     products = {
         1232: Product(maker="A", model="1232", type_=ProductType.PC),
         1233: Product(maker="A", model="1233", type_=ProductType.PC),
@@ -60,11 +61,9 @@ async def populate_db():
         Laptop(code=5, product=products[1752], speed=750, ram=128, hd=10, price="1150", screen=14),
         Laptop(code=6, product=products[1298], speed=450, ram=64, hd=10, price="950", screen=12),
     ]
+    session.add_all(products.values())
+    session.add_all(pcs)
+    session.add_all(printers)
+    session.add_all(laptops)
 
-    async with async_session_maker() as session:
-        session.add_all(products.values())
-        session.add_all(pcs)
-        session.add_all(printers)
-        session.add_all(laptops)
-
-        await session.commit()
+    await session.commit()

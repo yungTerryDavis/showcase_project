@@ -1,9 +1,28 @@
 services:
-  postgres:
-    image: "postgres:17.6"
+  pc_firm_db:
+    image: "postgres:18.1"
     ports:
       - "5432:5432"
     environment:
       POSTGRES_PASSWORD: "postgres"
       POSTGRES_USER: "postgres"
       POSTGRES_DB: "pc_firm"
+    volumes:
+      - pgdata:/var/lib/postgresql/18/docker
+  movies_service:
+    image: "movie_service:latest"
+    ports:
+      - "8080:8000"
+  movies_db:
+    image: "postgres:18.1"
+    ports:
+      - "6432:5432"
+    environment:
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_DB: "movies"
+    volumes:
+      - movies_pgdata:/var/lib/postgresql/18/docker
+volumes:
+  pgdata:
+  movies_pgdata:

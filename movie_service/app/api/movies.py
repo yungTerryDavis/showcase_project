@@ -1,6 +1,6 @@
-from models import Movie
-from repository import GeneralRepository as REPO
-from schemas import CreateMovieSchema, UpdateMovieSchema
+from movie_service.app.api.models import Movie
+from movie_service.app.api.repository import Repository as REPO
+from movie_service.app.api.schemas import CreateMovieSchema, UpdateMovieSchema
 
 
 class MovieService:
@@ -13,7 +13,10 @@ class MovieService:
 
     async def update_movie(self, id: int, movie: UpdateMovieSchema):
         if await REPO.get_movie(id):  # add walrus op?
-            rows_affected = await REPO.update_movie(id, movie.model_dump())
+            rows_affected = await REPO.update_movie(
+                id,
+                movie.model_dump(exclude_none=True)
+            )
         else:
             raise IndexError(f"No movie with id {id}")
         return bool(rows_affected)

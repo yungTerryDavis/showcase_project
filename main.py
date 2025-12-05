@@ -1,19 +1,19 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, Response
-from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
+from fastapi import FastAPI, Response
+from starlette.status import HTTP_404_NOT_FOUND
 
-from schemas import CreateMovieSchema, MovieSchema, UpdateMovieSchema
-from service import MovieService
 from sql_tasks import SQLTasks
 from utils import is_db_data_present, populate_db
+from database import async_session_maker
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     if not await is_db_data_present():
         print("No data found. Populating DB...")
-        await populate_db()
+        async with async_session_maker() as session:
+            await populate_db(session)
     yield
 
 
@@ -22,6 +22,9 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 async def read_root():
+    import sys, os
+    print(sys.path)
+    print(os.getcwd())
     return {"Hello": "World!"}
 
 
@@ -53,36 +56,3 @@ async def get_sql_solution_image(task_id: int, download: bool = False):
         media_type="image/png",
         headers=headers
     )
-
-
-@app.get("/movie/all", response_model=list[MovieSchema])
-async def index_movies():
-    movie_service = MovieService()
-    return await movie_service.list_movies()
-
-
-@app.post("/movie", status_code=HTTP_201_CREATED)
-async def add_movie(payload: CreateMovieSchema):
-    movie_service = MovieService()
-    movie_id = await movie_service.add_movie(payload)
-    return {"id": movie_id}
-
-
-@app.put("/movie/{id}")
-async def update_movie(id: int, payload: UpdateMovieSchema):
-    movie_service = MovieService()
-    try:
-        _ = await movie_service.update_movie(id, payload)
-    except Exception as e:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(e))
-    return {"status": "ok", "id": id}
-
-
-@app.delete("/movie/{id}")
-async def delete_movie(id: int):
-    movie_service = MovieService()
-    try:
-        _ = await movie_service.delete_movie(id)
-    except Exception as e:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=str(e))
-    return {"status": "ok", "id": id}
