@@ -13,6 +13,9 @@ services:
     image: "movie_service:latest"
     ports:
       - "8080:8000"
+    environment:
+      DB_HOST: "movies_db"
+      DB_PORT: "5432"
   movies_db:
     image: "postgres:18.1"
     ports:
